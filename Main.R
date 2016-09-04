@@ -57,3 +57,69 @@ res_tu_validate <- data.frame(InOrNot = tu_validate$Var1 %in% user_info$uid)
 
 all(res_tq_validate$InOrNot)
 all(res_tu_validate$InOrNot)
+
+## Feature 1: label
+lb <- data.frame(labelFlag = 1:nrow(invited_info_train) * 0, 
+                 wordFlag = 1:nrow(invited_info_train) * 0,
+                 charFlag = 1:nrow(invited_info_train) * 0)
+
+library(stringr)
+lbfun <- function(x) {
+  q <- filter(question_info, qid == x[1])
+  u <- filter(user_info, uid == x[2])
+  
+  q_label <- q$label
+  u_label <- unlist(str_split(u$label, "/"))
+  if(q_label %in% u_label)
+    lb$labelFlag <- 1
+}
+
+library(dplyr)
+testa <- head(validate_nolabel) %>%
+  lapply(lbfun)
+
+hval <- head(validate_nolabel)
+testa <- apply(hval, 1, lbfun)
+
+apply(validate_nolabel, 1, lbfun)
+
+
+# collect all the user's wordIDs
+labels <- user_info %>%
+  select(label) %>%
+  lapply(., str_split, "/") %>%
+  lapply(unlist) %>%
+  as.data.frame() %>%
+  unique()
+
+gWord_user <- function(lab) {
+  res <- user_info %>%
+    filter(label == as.character(lab)) %>%
+    select(wordID) %>%
+    lapply(., str_split, "/") %>%
+    lapply(unlist) %>%
+    unique()
+  return(res)
+}
+
+wordIDSet_user <- lapply(labels$label, gWord_user)
+
+# get all the wordIDs of the user through collect the questions she answered.
+fWordIDs_user <- function(userID) {
+  answered_q <- invited_info_train %>%
+    filter(uid == userID, flag == 1) %>%
+    select(qid) %>%
+    unique()
+  
+  wordIDs <- filter(question_info, qid %in% answered_q$qid) %>%
+    select(wordID) %>%
+    lapply(., str_split, "/") %>%
+    lapply(., unlist) %>%
+    unique() %>%
+    unlist()
+  
+  return(wordIDs)
+}
+
+## test fWordIDs_user
+fWordIDs_user("e6a2ecac7f90d426103de95ba7f6d2b0")
