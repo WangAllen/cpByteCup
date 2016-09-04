@@ -23,7 +23,7 @@ user_info <- read.table(file = "data/user_info.txt", header = F, sep = "\t")
 colnames(user_info) <- c("uid", "label", "wordID", "charID")
 
 question_info <- read.table(file = "data/question_info.txt", header = F, sep = "\t")
-colnames(question_info) <- c("qid", "label", "wordID", "charID", "good", "count", "topGrade")
+colnames(question_info) <- c("qid", "label", "wordID", "charID", "topQuality", "totalNumber", "upvotes")
 
 invited_info_train <- read.table(file = "data/invited_info_train_new.txt", header = F, sep = "\t")
 colnames(invited_info_train) <- c("qid", "uid", "flag")
@@ -36,4 +36,24 @@ colnames(validate_nolabel) <- c("qid", "uid")
 # invited_info_test
 
 ###
+# frequencies of questions and user in invited_info_train
+tq_invited <- as.data.frame(table(invited_info_train$qid))
+tu_invited <- as.data.frame(table(invited_info_train$uid))
 
+# frequencies of questions and usre in validate_nolabel
+tq_validate <- as.data.frame(table(validate_nolabel$qid))
+tu_validate <- as.data.frame(table(validate_nolabel$uid))
+
+### Check if the questions of invited_info_train and validate_nolabel are all in question_info
+res_tq_invited <- data.frame(InOrNot = tq_invited$Var1 %in% question_info$qid)
+res_tu_invited <- data.frame(InOrNot = tu_invited$Var1 %in% user_info$uid)
+
+all(res_tq_invited$InOrNot)
+all(res_tu_invited$InOrNot)
+
+### Check if the users of invited_info_train and validate_nolabel are all in user_info
+res_tq_validate <- data.frame(InOrNot = tq_validate$Var1 %in% question_info$qid)
+res_tu_validate <- data.frame(InOrNot = tu_validate$Var1 %in% user_info$uid)
+
+all(res_tq_validate$InOrNot)
+all(res_tu_validate$InOrNot)
