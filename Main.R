@@ -18,7 +18,7 @@
 library(readr)
 library(dplyr)
 library(ggplot2)
-
+library(stringr)
 user_info <- read.table(file = "data/user_info.txt", header = F, sep = "\t")
 colnames(user_info) <- c("uid", "label", "wordID", "charID")
 
@@ -123,3 +123,85 @@ fWordIDs_user <- function(userID) {
 
 ## test fWordIDs_user
 fWordIDs_user("e6a2ecac7f90d426103de95ba7f6d2b0")
+
+### added @2016.09.05
+## extract features by label, wordID and charID
+#! time consuming
+fWordIDSet <- function(x) {
+  questionID <- x[1]
+  userID <- x[2]
+  
+  # labels
+  ulabel <- filter(user_info, uid == userID)$label
+  qlabel <- filter(question_info, qid == questionID)$label
+  u_label <- unlist(str_split(ulabel, "/"))
+  if(qlabel %in% u_label)
+    f_label <- 1
+  else
+    f_label <- 0
+  
+  # user answered questions
+  answered_q <- invited_info_train %>%
+    filter(uid == as.character(userID), flag == 1) %>%
+    select(qid) %>%
+    unique()
+  
+  # wordID set of userID answered questions with the same label to current one
+  wordIDs_answered <- filter(question_info, qid %in% answered_q$qid, label == as.character(qlabel)) %>%
+    select(wordID) %>%
+    lapply(., str_split, "/") %>%
+    lapply(., unlist) %>%
+    as.data.frame() %>%
+    unique()
+  
+  # current question wordIDs
+  wordIDs_q <- filter(question_info, qid == questionID) %>%
+    select(wordID) %>%
+    lapply(., str_split, "/") %>%
+    lapply(., unlist) %>%
+    as.data.frame() %>%
+    unique()
+  
+  # feature f_wordID
+  f_wordID <- length(intersect(wordIDs_q$wordID, wordIDs_answered$wordID)) / length(union(wordIDs_q$wordID, wordIDs_answered$wordID))
+  
+  # charID set of userID answered questions with the same label to current one
+  charIDs_answered <- filter(question_info, qid %in% answered_q$qid, label == as.character(qlabel)) %>%
+    select(charID) %>%
+    lapply(., str_split, "/") %>%
+    lapply(., unlist) %>%
+    as.data.frame() %>%
+    unique()
+  
+  # current question charIDs
+  charIDs_q <- filter(question_info, qid == questionID) %>%
+    select(charID) %>%
+    lapply(., str_split, "/") %>%
+    lapply(., unlist) %>%
+    as.data.frame() %>%
+    unique()
+  
+  # feature f_charID
+  f_charID <- length(intersect(charIDs_q$charID, charIDs_answered$charID)) / length(union(charIDs_q$charID, charIDs_answered$charID))
+  
+  df <- data.frame(f_label, f_wordID, f_charID)
+  return(df)
+}
+
+testset <- head(invited_info_train[,c("qid","uid")])
+tsf <- apply(testset, 1, fWordIDSet)
+tb <- tsf %>%
+  as.data.frame() %>%
+  unlist
+seq1 <- seq(1, length(tb), 3)
+tb[seq1]
+tb
+
+# usage
+features <- apply(invited_info_train[,c("qid","uid")], 1, fWordIDSet)
+features %>%
+  unlist %>%
+## to be continued...  
+
+
+total <- cbind(invited_info_train, features)
