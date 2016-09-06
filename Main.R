@@ -203,5 +203,6 @@ features %>%
   unlist %>%
 ## to be continued...  
 
-
+## @2016.09.06
+## Today I wrote nothing
 total <- cbind(invited_info_train, features)
