@@ -12,7 +12,7 @@ colnames(user_info) <- c("uid", "label", "wordID", "charID")
 
 # question_info
 question_info <- read.table(file = "data/question_info.txt", header = F, sep = "\t")
-colnames(question_info) <- c("qid", "label", "wordID", "charID", "topQuality", "totalNumber", "upvotes")
+colnames(question_info) <- c("qid", "label", "wordID", "charID", "upvotes", "totalNumber", "topQuality")
 
 # training data
 invited_info_train <- read.table(file = "data/invited_info_train_new.txt", header = F, sep = "\t")

@@ -47,3 +47,7 @@ barplot(table(user_info$label))
 
 # plot the label frequencies of questions
 barplot(table(question_info$label))
+
+# testa <- apply(question_info, 1, checkQuestion)
+# all(apply(question_info, 1, checkQuestion))
+# we find not all questions "totalNumber" >= "topQuality" >= "upvotes"
