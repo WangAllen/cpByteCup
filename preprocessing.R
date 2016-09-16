@@ -1,7 +1,9 @@
 # preprocessing.R
 #   preprocess data
 #
-# 2016.09.08
+# 2016.09.08 added
+# 2016.09.13 modified to replace the Nas to 0 in myDataset_train(predict)
+
 library(dplyr)
 library(stringr)
 
@@ -38,6 +40,7 @@ myDataset_train <- featureCbind(features_label, myDataset_train)
 myDataset_train <- featureCbind(features_vote, myDataset_train)
 myDataset_train <- featureCbind(features_wordID, myDataset_train)
 myDataset_train <- featureCbind(features_charID, myDataset_train)
+myDataset_train[is.na(myDataset_train)] <- 0
 
 colnames(myDataset_train) <- c("qid", "uid", "label", "f_label", "f_label_ans", "f_label_non_ans", "f_total_asked", "f_total_ans", 
                                "f_total_same_asked", "f_total_same_ans", "f_total_avg_up", "f_total_avg_no", 
@@ -64,6 +67,7 @@ myDataset_predict <- featureCbind(features_label, myDataset_predict)
 myDataset_predict <- featureCbind(features_vote, myDataset_predict)
 myDataset_predict <- featureCbind(features_wordID, myDataset_predict)
 myDataset_predict <- featureCbind(features_charID, myDataset_predict)
+myDataset_predict[is.na(myDataset_predict)] <- 0
 
 colnames(myDataset_predict) <- c("qid", "uid", "label", "f_label", "f_label_ans", "f_label_non_ans", "f_total_asked", "f_total_ans", 
                                "f_total_same_asked", "f_total_same_ans", "f_total_avg_up", "f_total_avg_no", 

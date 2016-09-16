@@ -26,7 +26,8 @@ source("functions.R")
 
 # preprocess data
 source("preprocessing.R")
-
+load(file = "exchange/myDataset_train.rdata")
+load(file = "exchange/myDataset_predict.rdata")
 # models and predict results
 source("models/linearModel.R")
 source("models/logisticRegression.R")
